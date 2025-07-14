@@ -1,4 +1,4 @@
-# Wiby Fumble
+# Fumble
 Serve random “old-web” pages in a click.
 
 ## Quick start
