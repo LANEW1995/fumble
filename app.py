@@ -1,10 +1,9 @@
-import re
-from urllib.parse import urljoin
-
 import requests
-from bs4 import BeautifulSoup
-from flask import Flask, Response, jsonify, request
+import re
+from flask import Flask, jsonify, request, Response
 from flask_cors import CORS
+from bs4 import BeautifulSoup
+from urllib.parse import urljoin
 
 app = Flask(__name__)
 CORS(app)
@@ -14,24 +13,13 @@ URL_REGEX = re.compile(r"URL='([^']*)'")
 @app.route("/")
 def get_wiby_url():
     try:
-        wiby_response = requests.get("https://wiby.me/surprise/")
-        wiby_response.raise_for_status()
-
-        if match := URL_REGEX.search(wiby_response.text):
-            url = match.group(1)
-
-            # ── log the fumbled URL ───────────────────────────
-            with open("fumbled_urls.txt", "a", encoding="utf-8") as log:
-                log.write(url + "\n")
-            # ─────────────────────────────────────────────────
-
-            return jsonify(url=url)
-
+        response = requests.get("https://wiby.me/surprise/")
+        response.raise_for_status()
+        if match := URL_REGEX.search(response.text):
+            return jsonify(url=match.group(1))
         return "URL not found in meta tag", 404
-
     except requests.exceptions.RequestException as e:
         return f"Request failed: {e}", 500
-
 
 @app.route("/proxy")
 def proxy_request():
@@ -40,11 +28,11 @@ def proxy_request():
         return "No URL provided.", 400
 
     try:
-        proxy_response = requests.get(target_url, timeout=15)
+        resp = requests.get(target_url, timeout=15)
         
         # Check if the content is HTML to rewrite links
-        if 'text/html' in proxy_response.headers.get('Content-Type', ''):
-            soup = BeautifulSoup(proxy_response.text, 'html.parser')
+        if 'text/html' in resp.headers.get('Content-Type', ''):
+            soup = BeautifulSoup(resp.text, 'html.parser')
 
             # Rewrite links for all tags with an 'href'
             for tag in soup.find_all(href=True):
@@ -60,7 +48,7 @@ def proxy_request():
             return str(soup)
         else:
             # If not HTML (image, css, etc.), just stream it
-            return Response(proxy_response.content, status=proxy_response.status_code, content_type=proxy_response.headers['Content-Type'])
+            return Response(resp.content, status=resp.status_code, content_type=resp.headers['Content-Type'])
 
     except requests.exceptions.RequestException as e:
         return f"Could not proxy request: {e}", 500
