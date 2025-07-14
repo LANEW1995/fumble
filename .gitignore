@@ -1,0 +1,30 @@
+# Fumbled URLs log file
+fumbled_urls.txt
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+.env
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Flask instance folder
+instance/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
