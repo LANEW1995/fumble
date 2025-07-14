@@ -8,9 +8,7 @@ python -m pip install -r requirements.txt
 python app.py
 # hit http://localhost:5000/ for JSON, or
 # http://localhost:5000/proxy?url=<site> to view through the proxy
-markdown
-Copy
-Edit
+```
 ## Endpoints
 | Route | What it does |
 | ----- | ------------ |
